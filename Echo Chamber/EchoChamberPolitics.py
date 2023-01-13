@@ -5,12 +5,7 @@ import json
 import accuracyTest
 
 
-#Rory__gilmartin
-ego = "AllenLallen81"
-graph = {}
-graph[ego] = []
 client = tweepy.Client(bearer_token='AAAAAAAAAAAAAAAAAAAAAFj0hwEAAAAACZOCgk6vyIaWdJvXMzG%2BNjYK75o%3D3GKg59g2YXoFcbKD5oyL5oP8rwfTw0kGGbtRd9MpLForplCj8Q',wait_on_rate_limit=True)
-
 consumer_key = "cBFx745dKpTo1emtbhgJr1mAZ" 
 consumer_secret = "WFFElpiFHCs9CB0JXnVQTDcNpsqW6VsJ7OV97ugD0vI5qCuoSM" 
 access_token = "1299158638217453569-9DTfODUeB5y97e2YMoDrrsxjUClmVC" 
@@ -37,18 +32,20 @@ def get_following(name, n):
    
 def remove_single_element_lists(dictionary):
     keys_to_remove = []
+    
     for key, value in dictionary.items():
         if isinstance(value, list) and len(value) == 1:
             keys_to_remove.append(key)
+            
     for key in keys_to_remove:
         del dictionary[key]
+        
     return dictionary
 
    
-def findFollowers(ego):
+def find_followers(ego, graph):
     followerData = get_followers(ego, 100).data
     followingData = get_following(ego, 100).data
-
 
     for follower in followerData:
         graph[ego].append(follower.username)
@@ -56,7 +53,7 @@ def findFollowers(ego):
         graph[ego].append(following.username)
 
       
-def colorConvert(score):
+def color_convert(score):
     if score > 0:
         return [1, 0, 0,float(abs(score))]
     if score < 0:
@@ -65,10 +62,12 @@ def colorConvert(score):
         return [0,0,0,0]
 
      
-def get_political_score(handle, n):
-    findFollowers(ego)
+def get_echo_chamber(ego):
+	graph = {}
+	graph[ego] = []
+	
+	findFollowers(ego, graph)
     checked = []
-
 
     count = 1
     for name in graph[ego]:
@@ -78,7 +77,6 @@ def get_political_score(handle, n):
         for target in graph.keys():
             if target not in checked and target != source:
                 friendship = api.get_friendship(source_screen_name = source, target_screen_name = target)
-                print(count)
                 count += 1
             
                 if friendship[0].followed_by == True or friendship[0].following == True:
@@ -89,8 +87,14 @@ def get_political_score(handle, n):
     color_map = []
     for key in graph.keys():
         color_map.append(colorConvert(get_political_score(key,1500)))
-        print(key)
+		
+	return graph
 
+		
+if __name__ == '__main__':
+	ego = "AllenLallen81"
+	graph = get_echo_chamber(ego)
+	
     G = nx.Graph((graph))
     node_and_degree = G.degree()
     hub_ego = nx.ego_graph(G, ego,radius=100)
@@ -100,12 +104,12 @@ def get_political_score(handle, n):
     seed = 20532
 
     pos = nx.kamada_kawai_layout(hub_ego)
-    #pos = nx.spring_layout(hub_ego, k=2, iterations=20)
     options = {
         "edgecolors": "black",
         "linewidths": 1,
         "width": 0.2,
     }
+    
     print(nx.density(G))
     print(len(graph))
 
