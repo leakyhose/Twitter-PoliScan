@@ -2,10 +2,10 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import tweepy
 import json
-import accuracyTest
+import accuracyTest as at
 
 
-client = tweepy.Client(bearer_token='AAAAAAAAAAAAAAAAAAAAAFj0hwEAAAAACZOCgk6vyIaWdJvXMzG%2BNjYK75o%3D3GKg59g2YXoFcbKD5oyL5oP8rwfTw0kGGbtRd9MpLForplCj8Q',wait_on_rate_limit=True)
+client = tweepy.Client(bearer_token='AAAAAAAAAAAAAAAAAAAAAFj0hwEAAAAACZOCgk6vyIaWdJvXMzG%2BNjYK75o%3D3GKg59g2YXoFcbKD5oyL5oP8rwfTw0kGGbtRd9MpLForplCj8Q', wait_on_rate_limit=True)
 consumer_key = "cBFx745dKpTo1emtbhgJr1mAZ" 
 consumer_secret = "WFFElpiFHCs9CB0JXnVQTDcNpsqW6VsJ7OV97ugD0vI5qCuoSM" 
 access_token = "1299158638217453569-9DTfODUeB5y97e2YMoDrrsxjUClmVC" 
@@ -55,11 +55,11 @@ def find_followers(ego, graph):
       
 def color_convert(score):
     if score > 0:
-        return [1, 0, 0,float(abs(score))]
+        return [1, 0, 0, float(abs(score))]
     if score < 0:
-        return [0,0,1,float(abs(score))]
+        return [0, 0, 1, float(abs(score))]
     else:
-        return [0,0,0,0]
+        return [0, 0, 0, 0]
 
      
 def get_echo_chamber(ego):
@@ -75,8 +75,8 @@ def get_echo_chamber(ego):
       
     for source in graph.keys():
         for target in graph.keys():
-            if target not in checked and target != source:
-                friendship = api.get_friendship(source_screen_name = source, target_screen_name = target)
+        	if target not in checked and target != source:
+            	friendship = api.get_friendship(source_screen_name = source, target_screen_name = target)
                 count += 1
             
                 if friendship[0].followed_by == True or friendship[0].following == True:
@@ -86,8 +86,8 @@ def get_echo_chamber(ego):
 
     color_map = []
     for key in graph.keys():
-        color_map.append(colorConvert(get_political_score(key,1500)))
-		
+        color_map.append(colorConvert(at.get_political_score(key, 1500)))
+	
 	return graph
 
 		
@@ -97,7 +97,7 @@ if __name__ == '__main__':
 	
     G = nx.Graph((graph))
     node_and_degree = G.degree()
-    hub_ego = nx.ego_graph(G, ego,radius=100)
+    hub_ego = nx.ego_graph(G, ego, radius=100)
     d = dict(G.degree)
 
     print(color_map)
@@ -114,7 +114,7 @@ if __name__ == '__main__':
     print(len(graph))
 
     bing = 5
-    nx.draw_networkx(hub_ego, pos,node_size=[v * bing for v in d.values()],with_labels=False,node_color=color_map,**options)
-    nx.draw_networkx_nodes(hub_ego,pos,nodelist=[ego],node_size=[v * bing for v in d.values()][0],node_color=(0,1,0),edgecolors="black",linewidths=1)
+    nx.draw_networkx(hub_ego, pos, node_size=[v * bing for v in d.values()], with_labels=False,n ode_color=color_map, **options)
+    nx.draw_networkx_nodes(hub_ego, pos, nodelist=[ego], node_size=[v * bing for v in d.values()][0], node_color=(0, 1, 0), edgecolors="black", linewidths=1)
     plt.axis("off")
     plt.show()
