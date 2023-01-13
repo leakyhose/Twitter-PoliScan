@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import tweepy
 import json
-from accuracyTest import get_political_score
+import accuracyTest
 
 
 #Rory__gilmartin
